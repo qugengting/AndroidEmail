@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatEditText xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@null"
+    android:includeFontPadding="false"
+    android:minWidth="50dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:textColor="@color/hint_normal"
+    android:textCursorDrawable="@drawable/edittext_cursor"
+    android:textSize="14sp"
+    tools:text="王大锤">
+
+</androidx.appcompat.widget.AppCompatEditText>

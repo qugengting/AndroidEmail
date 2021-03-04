@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/mail_info"
+            android:textColor="@color/mail_label"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvAccount"
+            android:textColor="@color/colorThemeII"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:text="703195383@qq.com"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/mail_files"
+            android:textColor="@color/mail_label"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvRecv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/ic_mail_recv"
+            android:text="@string/mail_receiver"
+            android:textColor="@color/colorThemeII"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/ic_mail_send"
+            android:text="@string/mail_sender"
+            android:textColor="@color/colorThemeII"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+
+</androidx.core.widget.NestedScrollView>

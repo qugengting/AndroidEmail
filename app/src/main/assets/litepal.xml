@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="qugengting_email" />
+    <version value="1" />
+    <list>
+        <mapping class="com.qugengting.email.bean.MailBean" />
+        <mapping class="com.qugengting.email.bean.MailLoadFlag" />
+        <mapping class="com.qugengting.email.bean.SearchHisBean" />
+        <mapping class="com.qugengting.email.bean.AttachBean" />
+
+    </list>
+</litepal>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_white_preferences_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp">
+
+        <View
+            android:id="@+id/iv_mail_read"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_unread" />
+
+        <TextView
+            android:id="@+id/tv_mail_sender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="@color/colorThemeII"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="马云" />
+
+        <ImageView
+            android:id="@+id/iv_mail_attach"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_mail_attachment" />
+
+        <TextView
+            android:id="@+id/tv_mail_send_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:singleLine="true"
+            android:textColor="#B5BCC5"
+            android:textSize="10sp"
+            tools:text="2018-04-18" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_mail_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="20dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="#143968"
+        android:textSize="12sp"
+        tools:text="【1月份第4周】价值链IT中心项目周报(01.25_02.04)" />
+
+    <TextView
+        android:id="@+id/tv_mail_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="13dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/hint_normal"
+        android:textSize="12sp"
+        tools:text="各位好本周周报需提交以下内容，请于1月29号下午18点前完成提交。一、各个部门负责人提交项目周报，提交内容按提交内容按提交内容按：附…" />
+
+    <View
+        style="@style/SingleLineStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp" />
+
+</LinearLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mail_click">#1FB9D4</color>
+    <color name="hint_normal">#878D94</color>
+    <color name="hint_input">#ABB3BD</color>
+    <color name="mail_label">#ABB3BD</color>
+
+    <color name="colorThemeII">#00295C</color>
+    <color name="white">#FFFFFF</color><!--白色 -->
+    <color name="black">#000000</color><!--黑色 -->
+</resources>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeMenuView">
+        <attr name="swipeEnable" format="boolean"/>
+        <attr name="ios" format="boolean"/>
+        <attr name="leftSwipe" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="AutoLineFeedLayout">
+        <attr name="debug" format="boolean"></attr>
+
+        <attr name="paddingLeft" format="reference|dimension"/>
+        <attr name="paddingRight" format="reference|dimension"/>
+        <attr name="paddingTop" format="reference|dimension"/>
+        <attr name="paddingBottom" format="reference|dimension"/>
+
+        <attr name="verticalSpacing" format="reference|dimension"/>
+        <attr name="horizontalSpacing" format="reference|dimension"/>
+    </declare-styleable>
+
+    <!-- ShadowLayout 阴影 -->
+    <declare-styleable name="ShadowLayout">
+        <attr name="shadowColor" format="color"/>
+        <attr name="shadowRadius" format="dimension"/>
+        <attr name="shadowDx" format="dimension"/>
+        <attr name="shadowDy" format="dimension"/>
+        <attr name="hasBottomPadding" format="boolean" />
+        <attr name="hasTopPadding" format="boolean" />
+        <attr name="shadowShape">
+            <flag name="rectangle" value="0x0001"/>
+            <flag name="oval" value="0x0010"/>
+        </attr>
+        <attr name="shadowSide">
+            <flag name="all" value="0x1111"/>
+            <flag name="left" value="0x0001"/>
+            <flag name="top" value="0x0010"/>
+            <flag name="right" value="0x0100"/>
+            <flag name="bottom" value="0x1000"/>
+        </attr>
+    </declare-styleable>
+
+    <!--标题栏样式-->
+    <declare-styleable name="CustomToolBar">
+        <!--左按钮是否可见|背景-->
+        <attr name="left_btn_visible" format="boolean"/>
+        <attr name="left_btn_src" format="reference|color"/>
+        <!--左文本是否可见|文本内容-->
+        <attr name="left_tv_visible" format="boolean"/>
+        <attr name="left_tv_text" format="string"/>
+        <!--右边按钮是否可见|背景-->
+        <attr name="right_btn_visible" format="boolean"/>
+        <attr name="right_btn_src" format="reference|color"/>
+        <!--右文本是否可见|文本内容-->
+        <attr name="right_tv_visible" format="boolean"/>
+        <attr name="right_tv_text" format="string"/>
+        <!--右文本1是否可见|文本内容-->
+        <attr name="right1_tv_visible" format="boolean"/>
+        <attr name="right1_tv_text" format="string"/>
+        <!--标题是否可见|文本内容-->
+        <attr name="title_visible" format="boolean"/>
+        <attr name="title_text" format="string"/>
+        <!--背景-->
+        <attr name="barBackground" format="reference|color"/>
+        <!--标题icon是否可见，可见一般就有点击事件-->
+        <attr name="titleIcon" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="TagFlowLayout">
+        <attr name="tag_gravity">
+            <enum name="left" value="-1" />
+            <enum name="center" value="0" />
+            <enum name="right" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

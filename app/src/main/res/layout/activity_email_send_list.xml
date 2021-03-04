@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.qugengting.email.widget.ToolBar
+        android:layout_width="match_parent"
+        android:layout_height="44dip"
+        android:gravity="center"
+        app:right_btn_visible="true"
+        app:titleIcon="false"
+        app:title_text="@string/mail_sender" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="12dip"
+            android:layout_marginTop="12dip"
+            android:layout_marginEnd="12dip"
+            android:layout_marginBottom="12dip"
+            android:background="@drawable/bg_search">
+
+            <ImageView
+                android:id="@+id/selectImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_searchbar_search" />
+
+            <com.qugengting.email.widget.ClearEditText
+                android:id="@+id/edtSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:layout_toRightOf="@+id/selectImg"
+                android:background="@android:color/transparent"
+                android:hint="@string/mail_search"
+                android:singleLine="true"
+                android:textColor="@color/hint_input"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_mail_send"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:descendantFocusability="blocksDescendants"
+        tools:itemCount="4"
+        tools:listitem="@layout/list_item_send" />
+
+</LinearLayout>
