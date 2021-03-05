@@ -61,7 +61,6 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
     private var compositeDisposable: CompositeDisposable? = null
     private lateinit var dialog: PopupDialog
     private lateinit var popupView: PopupView
-    private var isFirstLoad = true
     private var updateResult = false
     private var lastUpdateTime = 0L
 
@@ -136,7 +135,9 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
         progressDialog.setMessage(getString(R.string.mail_please_wait))
         progressDialog.show()
         //RecyclerView关于notifyItemRemoved的那点小事 参考：http://blog.csdn.net/jdsjlzx/article/details/52131528
-        val bean = adapter.getDataList()[position]
+        //因为要删除对应附件，而附件有可能在邮件详情界面更新，所以需要重新从数据库取最新更新数据
+        val bean = LitePal.where("account = ? and uid = ?", MailConstants.MAIL_ACCOUNT
+                , adapter.getDataList()[position].uid.toString()).findFirst(MailBean::class.java)
         exec({
             deleteMail(bean)
         }, {
@@ -242,16 +243,9 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                     override fun onNext(value: String) {
                         rvRecv.refreshComplete(REQUEST_COUNT)
                         if (value == "ok") {
-                            updateResult = true
-                            if (isFirstLoad) { //第一次加载默认显示所有邮件
-                                titleSelect = ITEM_ALL
-                                showData()
-                                updateTitle()
-                                isFirstLoad = false
-                            } else {
-                                showData()
-                                updateTitle()
-                            }
+                            titleSelect = ITEM_ALL
+                            showData()
+                            updateTitle()
                             lastUpdateTime = System.currentTimeMillis()
                             tvUpdateStatus.text = String.format(getString(R.string.mail_update), DateUtils.getFormatDate(Date(lastUpdateTime)))
                         } else {
@@ -287,7 +281,12 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                     override fun onNext(value: String) {
                         rvRecv.refreshComplete(REQUEST_COUNT)
                         if (value == "ok") {
-                            adapter.notifyDataSetChanged()
+                            if (titleSelect != ITEM_ALL) {
+                                titleSelect = ITEM_ALL
+                                showData()
+                            } else {
+                                adapter.notifyDataSetChanged()
+                            }
                             updateTitle()
                         } else {
                             updateResult = false
@@ -298,8 +297,6 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                     override fun onError(e: Throwable) {
                         e.printStackTrace()
                         rvRecv.refreshComplete(REQUEST_COUNT)
-                        adapter.notifyDataSetChanged()
-                        rvRecv.smoothScrollToPosition(0) //滚回到顶部
                     }
 
                     override fun onComplete() {}
@@ -316,12 +313,31 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
         adapter.notifyDataSetChanged()
     }
 
+    /**
+     * 更新为已读
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun updateStatus(event: MailStatusEvent) {
-        list = LitePal.where("account = ? and type = ?"
-                , MailConstants.MAIL_ACCOUNT, "0").order("sendTime desc").find(MailBean::class.java)
-        adapter.setDataList(list)
-        updateTitle()
+        if (event.type == MailStatusEvent.TYPE_READ) {
+            //从本页进入详情页收到的通知
+            if (event.position != -1) {
+                val mailbean = adapter.getDataList()[event.position]
+                mailbean.readFlag = 1
+                adapter.notifyItemChanged(event.position)
+            }
+            //通过搜索界面进入详情页收到的通知
+            else {
+                list = LitePal.where("account = ? and type = ?"
+                        , MailConstants.MAIL_ACCOUNT, "0").order("sendTime desc").find(MailBean::class.java)
+                adapter.setDataList(list)
+                updateTitle()
+            }
+        } else if(event.type == MailStatusEvent.TYPE_DELETE) {
+            list = LitePal.where("account = ? and type = ?"
+                    , MailConstants.MAIL_ACCOUNT, "0").order("sendTime desc").find(MailBean::class.java)
+            adapter.setDataList(list)
+            updateTitle()
+        }
     }
 
     override fun onResume() {
@@ -411,6 +427,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                     }
                 }
                 mailBean = MailBean()
+                val isRead = isRead(message)
                 var isContainAttach = isContainAttach(message)
                 mailBean.fileFlag = if (isContainAttach) 1 else 0
                 mStringBufferContent = StringBuffer()
@@ -468,7 +485,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                 mailBean.content = mStringBufferContent.toString()
                 mailBean.previewContent = previewContent
                 mailBean.attachFlag = if (isContainAttach) 1 else 0
-                mailBean.readFlag = 0
+                mailBean.readFlag = if (isRead) 1 else 0
                 mailBean.downloadFlag = 0
                 mailBean.save()
                 list.add(mailBean)
@@ -483,6 +500,15 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
             return "error"
         }
         return "ok"
+    }
+
+    @Throws(MessagingException::class)
+    private fun isRead(message: Message): Boolean {
+        val flags = message.flags.systemFlags
+        for (f in flags) {
+            if (f == Flags.Flag.SEEN) return true
+        }
+        return false
     }
 
     private lateinit var mStringBufferContent: StringBuffer //存放邮件内容

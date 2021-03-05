@@ -44,6 +44,7 @@
     <string name="mail_not_null_warn">标题或内容不能为空</string>
     <string name="mail_no_recv_warn">收件人不能为空</string>
     <string name="mail_delete_fail_hint">删除邮件失败，请检查网络或稍候重试</string>
+    <string name="mail_link_fail_hint">连接服务器失败，请检查网络或稍候重试</string>
     <string name="mail_send_fail_hint">发送邮件失败，请检查网络或稍候重试</string>
     <string name="mail_send_success_hint">邮件发送成功</string>
     <string name="mail_attachment_download_fail">文件下载失败，请点击重试</string>

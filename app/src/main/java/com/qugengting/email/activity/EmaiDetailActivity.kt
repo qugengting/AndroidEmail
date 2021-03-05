@@ -58,6 +58,27 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
         }
         tvTitle.text = mailBean.title
 
+        val noRead = mailBean.readFlag == 0
+        if (noRead) {
+            //向服务器标记已读
+            exec({
+                setMailSeenFlag(mailBean)
+            }, {
+                if (it) {
+                    //标记成功
+                    loadMail()
+                    EventBus.getDefault().post(MailStatusEvent(MailStatusEvent.TYPE_READ, position))//通知首页邮件已读状态变更
+                } else {
+                    Utils.makeText(this@EmaiDetailActivity, getString(R.string.mail_link_fail_hint))
+                    finish()
+                }
+            })
+        } else {
+            loadMail()
+        }
+    }
+
+    private fun loadMail() {
         if (mailBean.fileFlag == 0) {
             //该邮件没有需要处理的内容（包括附件和正文中的图片等），不用再去获取
             webView.loadData(content, "text/html; charset=UTF-8", null)
@@ -81,8 +102,6 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
             rvAttach.layoutManager = LinearLayoutManager(this)
             attachAdapter.setDataList(mailBean.attachList)
             tvAttachLabel.text = String.format(getString(R.string.mail_attach_label), mailBean.attachList.size)
-
-            EventBus.getDefault().post(MailStatusEvent())//通知首页附件状态更新
         }
     }
 
@@ -116,8 +135,8 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
         }, {
             progressDialog.dismiss()
             if (it) {
-                //通知首页更新数据
-                EventBus.getDefault().post(MailStatusEvent())
+                //通知首页或发件箱界面更新数据
+                EventBus.getDefault().post(MailStatusEvent(MailStatusEvent.TYPE_DELETE, -1))
                 finish()
             } else {
                 Utils.makeText(this@EmaiDetailActivity, R.string.mail_delete_fail_hint)
@@ -137,7 +156,7 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
             R.id.lyDetailDelete -> {
                 Utils.showDialog(this, getString(R.string.mail_delete_title), getString(R.string.mail_delete_prompt), getString(R.string.mail_delete_confirm),
                         DialogInterface.OnClickListener { _, _ ->
-                            //从首页列表点击进来的，由首页自己去做删除处理
+                            //从首页或发件箱点击进来的，由原界面自己去做删除处理
                             if (position != -1) {
                                 val i = Intent()
                                 i.putExtra("position", position)

@@ -8,10 +8,8 @@ import com.qugengting.email.R
 import com.qugengting.email.activity.BaseActivity
 import com.qugengting.email.activity.EmaiDetailActivity
 import com.qugengting.email.bean.MailBean
-import com.qugengting.email.eventbus.MailStatusEvent
 import com.qugengting.email.utils.DateUtils
 import com.qugengting.email.utils.start
-import org.greenrobot.eventbus.EventBus
 import java.util.*
 
 class SearchResultAdapter(context: Context) : ListBaseAdapter<MailBean>(context) {
@@ -36,10 +34,6 @@ class SearchResultAdapter(context: Context) : ListBaseAdapter<MailBean>(context)
         ivAttachment.visibility = if (getDataList()[position].attachFlag == 0) View.GONE else View.VISIBLE
         //注意事项，设置item点击，不能对整个holder.itemView设置咯，只能对第一个子View，即原来的content设置，这算是局限性吧。
         contentView.setOnClickListener {
-            val bean = getDataList()[position]
-            bean.readFlag = 1
-            bean.save()
-            EventBus.getDefault().post(MailStatusEvent())//邮件已读状态变更
             (mContext as BaseActivity).start<EmaiDetailActivity> {
                 putExtra("uid", getDataList()[position].uid)
             }

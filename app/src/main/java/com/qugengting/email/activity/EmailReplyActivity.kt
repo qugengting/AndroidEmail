@@ -766,6 +766,7 @@ class EmailReplyActivity : EmailAttachmentBaseActivity(), View.OnClickListener {
                 uid = sendUid
                 fileFlag = if (hasSomePart) 1 else 0
                 downloadFlag = 1
+                readFlag = 1
                 save()
             }
         } catch (e: MessagingException) {

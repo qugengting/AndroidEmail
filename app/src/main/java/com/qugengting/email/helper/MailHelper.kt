@@ -93,4 +93,47 @@ interface MailHelper {
             delete()
         }
     }
+
+    fun setMailSeenFlag(mailBean: MailBean): Boolean {
+        try {
+            val props = Properties()
+            props.setProperty("mail.transport.protocol", "imap") // 使用的协议（JavaMail规范要求）
+            props.setProperty("mail.smtp.host", MailConstants.MAIL_IMAP_HOST) // 发件人的邮箱的 SMTP服务器地址
+            props.setProperty("mail.imap.connectiontimeout", "5000") //设置连接超时时间
+            /*  The default IMAP implementation in JavaMail is very slow to download large attachments.
+                Reason for this is that, by default, it uses attachmentPath small 16K fetch buffer size.
+                You can increase this buffer size using the “mail.imap.fetchsize” system property
+                For example:
+            */props.setProperty("mail.imap.fetchsize", "1000000")
+            //加入以下设置，附件下载速度更是快了10倍
+            props.setProperty("mail.imap.partialfetch", "false")
+            // 获取连接
+            val mc = CommandMap.getDefaultCommandMap() as MailcapCommandMap
+            mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html")
+            mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml")
+            mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain")
+            mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed")
+            mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822")
+            CommandMap.setDefaultCommandMap(mc)
+            val session = Session.getDefaultInstance(props)
+            session.debug = false
+            // 获取Store对象
+            val store = session.getStore("imap")
+            store.connect(MailConstants.MAIL_IMAP_HOST, MailConstants.MAIL_ACCOUNT, MailConstants.MAIL_PWD)
+            // 通过POP3协议获得Store对象调用这个方法时，邮件夹名称只能指定为"INBOX"
+            val folder = store.getFolder("INBOX") // 获得用户的邮件帐户
+            folder.open(Folder.READ_WRITE) // 设置对邮件帐户的访问权限
+            val inbox = folder as IMAPFolder
+            val message = inbox.getMessageByUID(mailBean.uid)
+            message.setFlag(Flags.Flag.SEEN, true)
+            folder.close(true) // 关闭邮件夹对象
+            store.close() // 关闭连接对象
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        mailBean.readFlag = 1
+        mailBean.save()
+        return true
+    }
 }
