@@ -92,7 +92,6 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
         rvRecv.setRefreshProgressStyle(ProgressStyle.BallSpinFadeLoader)
         rvRecv.setArrowImageView(R.drawable.ic_pulltorefresh_arrow)
         rvRecv.setOnRefreshListener { getNewMail() }
-        rvRecv.refresh()
         rvRecv.setLoadMoreEnabled(true)
         rvRecv.setOnLoadMoreListener {
             val loadFlagBean = LitePal.where("account = ?", MailConstants.MAIL_ACCOUNT).findFirst(MailLoadFlag::class.java)
@@ -103,6 +102,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                 getOldMail()
             }
         }
+        rvRecv.refresh()
         edtSearch.inputType = InputType.TYPE_NULL //禁止弹出软键盘
 
         edtSearch.setOnClickListener(this)
@@ -332,7 +332,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                 adapter.setDataList(list)
                 updateTitle()
             }
-        } else if(event.type == MailStatusEvent.TYPE_DELETE) {
+        } else if (event.type == MailStatusEvent.TYPE_DELETE) {
             list = LitePal.where("account = ? and type = ?"
                     , MailConstants.MAIL_ACCOUNT, "0").order("sendTime desc").find(MailBean::class.java)
             adapter.setDataList(list)
@@ -652,9 +652,10 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
         private val TAG = MainActivity::class.java.simpleName
 
         /**
-         * 每一页展示多少条数据
+         * 每一页展示多少条数据，注意，这里不要随意乱改，会影响到加载更多的UI效果。。。
+         * 好在这个数据不需要怎么改
          */
-        private const val REQUEST_COUNT = 5000
+        private const val REQUEST_COUNT = 10
         private const val ITEM_ALL = 100
         private const val ITEM_UNREAD = 101
         private const val ITEM_READ = 102

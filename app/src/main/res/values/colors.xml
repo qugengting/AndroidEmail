@@ -8,4 +8,7 @@
     <color name="colorThemeII">#00295C</color>
     <color name="white">#FFFFFF</color><!--白色 -->
     <color name="black">#000000</color><!--黑色 -->
+
+
+    <color name="color_hint">#FFB5B5B5</color>
 </resources>
