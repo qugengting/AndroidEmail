@@ -99,11 +99,15 @@ public class OSUtil {
 
         private final Properties properties;
 
-        private BuildProperties() throws IOException {
+        private BuildProperties() {
             properties = new Properties();
             // 读取系统配置信息build.prop类
-            properties.load(new FileInputStream(new File(Environment.getRootDirectory(), "build" +
-                    ".prop")));
+            try {
+                properties.load(new FileInputStream(new File(Environment.getRootDirectory(), "build" +
+                        ".prop")));
+            } catch (IOException e) {
+
+            }
         }
 
         public boolean containsKey(final Object key) {

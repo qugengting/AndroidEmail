@@ -701,9 +701,7 @@ class EmailReplyActivity : EmailAttachmentBaseActivity(), View.OnClickListener {
             mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822")
             CommandMap.setDefaultCommandMap(mc)
             val transport = session.transport
-            //            transport.connect("smtp.qq.com", "**发送人的邮箱地址**", "**你的邮箱密码或者授权码**");
             transport.connect(MailConstants.MAIL_SMTP_HOST, MailConstants.MAIL_ACCOUNT, MailConstants.MAIL_PWD)
-            //            transport.sendMessage(msg, new Address[]{new InternetAddress("**接收人的邮箱地址**")});
             receiverAddress.addAll(ccAddress)
             val allReceivers = receiverAddress.toTypedArray()
             transport.sendMessage(msg, allReceivers)

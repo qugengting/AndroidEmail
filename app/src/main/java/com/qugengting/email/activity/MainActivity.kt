@@ -28,6 +28,7 @@ import com.qugengting.email.utils.systembar.StatusBarUtils
 import com.qugengting.email.widget.PopupDialog
 import com.qugengting.email.widget.PopupView
 import com.sun.mail.imap.IMAPFolder
+import com.sun.mail.util.MailSSLSocketFactory
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -380,6 +381,13 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
         //加入以下设置，附件下载速度更是快了10倍
         props.setProperty("mail.imap.partialfetch", "false")
 
+        props.setProperty("mail.imap.auth", "true")
+        // 企业邮箱必须开启协议SSL
+        val sf = MailSSLSocketFactory()
+        sf.isTrustAllHosts = true
+        props.setProperty("mail.imap.ssl.enable", "true")
+        props.setProperty("mail.imap.ssl.socketFactory", sf.toString())
+
         // 获取连接
         try {
             val mc = CommandMap.getDefaultCommandMap() as MailcapCommandMap
@@ -428,7 +436,16 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                 }
                 mailBean = MailBean()
                 val isRead = isRead(message)
-                var isContainAttach = isContainAttach(message)
+                var isContainAttach: Boolean
+                try {
+                    isContainAttach = isContainAttach(message)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e(TAG, "=====================>> " + "解析错误！！！" + " <<=====================")
+                    index--
+                    number++
+                    continue
+                }
                 mailBean.fileFlag = if (isContainAttach) 1 else 0
                 mStringBufferContent = StringBuffer()
                 try {
