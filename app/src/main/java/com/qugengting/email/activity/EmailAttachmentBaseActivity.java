@@ -75,6 +75,10 @@ public abstract class EmailAttachmentBaseActivity extends BaseActivity {
     protected CompositeDisposable compositeDisposable;
     protected MailBean mailBean;
     protected String content;
+    /**
+     * 是否编辑模式
+     */
+    protected boolean isEdit = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,11 +134,10 @@ public abstract class EmailAttachmentBaseActivity extends BaseActivity {
                         fileNames.add(file1.getName());
                     }
                 }
-                //替换src对应的内容为path <div><img src="cid:80E3B4F6@9AD8D94B.89A4D55A.jpg" filesize="1905418" modifysize="24%" diffpixels="13px" scalingmode="normal" style="width: 627px; height: 391px;"></div><div><br></div><div>香格里拉高山风光</div>
-                //foxmail正文图片名称例子：_Foxmail.1@848f557a-e0eb-c1ae-eb36-ba85b15e9b0d
+                //遍历找出正文里面的图片名称，如<div><img src="cid:80E3B4F6@9AD8D94B.89A4D55A.jpg"</div> 并加入集合
                 Document doc = Jsoup.parse(content);
-                Elements pngs = doc.select("img");
-                for (Element element : pngs) {
+                Elements imgElements = doc.select("img");
+                for (Element element : imgElements) {
                     String imgUrl = element.attr("src");
                     if (imgUrl.contains("cid:")) {
                         imgUrl = imgUrl.substring(4);
@@ -148,7 +151,7 @@ public abstract class EmailAttachmentBaseActivity extends BaseActivity {
                     }
                 }
                 //邮件有正文图片，但缓存里找不到，说明缓存被清空了，需要重新下载
-                if (pngs.size() > 0 && imgList.size() <= 0 && mailBean.getType() == 0) {
+                if (imgElements.size() > 0 && imgList.size() < imgElements.size() && mailBean.getType() == 0) {
                     mailBean.setDownloadFlag(0);
                     mailBean.save();
                     Log.e(TAG, "邮件图片被删除，需要重新下载");
@@ -180,7 +183,11 @@ public abstract class EmailAttachmentBaseActivity extends BaseActivity {
                         if (value.equals(NEED_RE_DOWNLOAD)) {
                             initMailWithAttachment();
                         } else {
-                            webView.loadData(value, "text/html; charset=UTF-8", null);
+                            if (isEdit) {
+                                webView.setHtml(value);
+                            } else {
+                                webView.loadData(value, "text/html; charset=UTF-8", null);
+                            }
                             showAttachment();
                         }
                     }

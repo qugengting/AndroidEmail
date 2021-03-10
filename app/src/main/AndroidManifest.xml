@@ -25,7 +25,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.EmaiDetailActivity"
+            android:name=".activity.EmailDetailActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.EmailSendEditActivity"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.EmailSendListActivity"

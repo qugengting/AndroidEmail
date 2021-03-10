@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.DisplayMetrics
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.qugengting.email.R
@@ -27,7 +26,7 @@ import org.litepal.LitePal
  * Created by xuruibin on 2018/4/17.
  * 描述：邮件详情界面
  */
-class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, MailHelper {
+class EmailDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, MailHelper {
 
     private lateinit var attachAdapter: AttachRecvAdapter
     private var position = 0
@@ -41,6 +40,13 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
         position = intent.getIntExtra("position", -1)
         mailBean = LitePal.where("account = ? and uid = ?"
                 , MailConstants.MAIL_ACCOUNT, uid.toString()).findFirst(MailBean::class.java)
+        //已发邮件，底部只显示一个"再次编辑"的按钮
+        if (mailBean.type == 1) {
+            tvReply.visibility = View.GONE
+            tvReplyAll.visibility = View.GONE
+            tvTransmit.visibility = View.GONE
+            tvRe_edit.visibility = View.VISIBLE
+        }
         content = mailBean.content
         tvSender1.text = mailBean.sender
         tvSender2.text = mailBean.sender
@@ -69,7 +75,7 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
                     loadMail()
                     EventBus.getDefault().post(MailStatusEvent(MailStatusEvent.TYPE_READ, position))//通知首页邮件已读状态变更
                 } else {
-                    Utils.makeText(this@EmaiDetailActivity, getString(R.string.mail_link_fail_hint))
+                    Utils.makeText(this@EmailDetailActivity, getString(R.string.mail_link_fail_hint))
                     finish()
                 }
             })
@@ -114,6 +120,7 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
         tvReply.setOnClickListener(this)
         tvReplyAll.setOnClickListener(this)
         tvTransmit.setOnClickListener(this)
+        tvRe_edit.setOnClickListener(this)
     }
 
     override fun onBackPressed() {
@@ -122,11 +129,11 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
     }
 
     companion object {
-        private val TAG = EmaiDetailActivity::class.java.simpleName
+        private val TAG = EmailDetailActivity::class.java.simpleName
     }
 
     private fun deleteMail() {
-        val progressDialog = ProgressDialog(this@EmaiDetailActivity)
+        val progressDialog = ProgressDialog(this@EmailDetailActivity)
         progressDialog.setMessage(getString(R.string.mail_please_wait))
         progressDialog.show()
         //RecyclerView关于notifyItemRemoved的那点小事 参考：http://blog.csdn.net/jdsjlzx/article/details/52131528
@@ -139,7 +146,7 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
                 EventBus.getDefault().post(MailStatusEvent(MailStatusEvent.TYPE_DELETE, -1))
                 finish()
             } else {
-                Utils.makeText(this@EmaiDetailActivity, R.string.mail_delete_fail_hint)
+                Utils.makeText(this@EmailDetailActivity, R.string.mail_delete_fail_hint)
             }
         })
         //且如果想让侧滑菜单同时关闭，需要同时调用 ((CstSwipeDelMenu) holder.itemView).quickClose();
@@ -193,6 +200,10 @@ class EmaiDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener, 
             R.id.tvTransmit -> start<EmailReplyActivity> {
                 putExtra("uid", uid)
                 putExtra(ReplyType.REPLY_TYPE, ReplyType.REPLY_TRANSMIT)
+            }
+            //再次编辑
+            R.id.tvRe_edit -> start<EmailSendEditActivity> {
+                putExtra("uid", uid)
             }
         }
     }

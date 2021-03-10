@@ -331,6 +331,21 @@
                 android:text="@string/mail_transmit"
                 android:textColor="@color/hint_normal"
                 android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvRe_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_mail_edit"
+                android:drawablePadding="1dp"
+                android:gravity="center_horizontal"
+                android:paddingTop="6dp"
+                android:text="@string/mail_re_edit"
+                android:textColor="@color/hint_normal"
+                android:textSize="10sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
         </LinearLayout>
     </com.qugengting.email.widget.ShadowLayout>
 </LinearLayout>

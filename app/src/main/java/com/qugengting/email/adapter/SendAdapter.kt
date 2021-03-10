@@ -8,11 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.qugengting.email.R
 import com.qugengting.email.activity.BaseActivity
-import com.qugengting.email.activity.EmaiDetailActivity
+import com.qugengting.email.activity.EmailDetailActivity
 import com.qugengting.email.bean.MailBean
 import com.qugengting.email.utils.DateUtils
 import com.qugengting.email.utils.getMailSimpleNames
-import com.qugengting.email.utils.start
 import com.qugengting.email.widget.SwipeMenuView
 import java.util.*
 
@@ -45,7 +44,7 @@ class SendAdapter(context: Context) : ListBaseAdapter<MailBean>(context) {
         }
         //注意事项，设置item点击，不能对整个holder.itemView设置咯，只能对第一个子View，即原来的content设置，这算是局限性吧。
         contentView.setOnClickListener {
-            val intent = Intent(mContext, EmaiDetailActivity::class.java)
+            val intent = Intent(mContext, EmailDetailActivity::class.java)
             intent.putExtra("uid", getDataList()[position].uid)
             intent.putExtra("position", position)
             (mContext as BaseActivity).startActivityForResult(intent, 1)

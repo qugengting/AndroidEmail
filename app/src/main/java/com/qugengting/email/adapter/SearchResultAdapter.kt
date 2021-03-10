@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.qugengting.email.R
 import com.qugengting.email.activity.BaseActivity
-import com.qugengting.email.activity.EmaiDetailActivity
+import com.qugengting.email.activity.EmailDetailActivity
 import com.qugengting.email.bean.MailBean
 import com.qugengting.email.utils.DateUtils
 import com.qugengting.email.utils.start
@@ -34,7 +34,7 @@ class SearchResultAdapter(context: Context) : ListBaseAdapter<MailBean>(context)
         ivAttachment.visibility = if (getDataList()[position].attachFlag == 0) View.GONE else View.VISIBLE
         //注意事项，设置item点击，不能对整个holder.itemView设置咯，只能对第一个子View，即原来的content设置，这算是局限性吧。
         contentView.setOnClickListener {
-            (mContext as BaseActivity).start<EmaiDetailActivity> {
+            (mContext as BaseActivity).start<EmailDetailActivity> {
                 putExtra("uid", getDataList()[position].uid)
             }
         }
