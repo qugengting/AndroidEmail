@@ -94,7 +94,7 @@ interface MailHelper {
         }
     }
 
-    fun setMailSeenFlag(mailBean: MailBean): Boolean {
+    fun setMailSeenFlag(mails: List<MailBean>): Boolean {
         try {
             val props = Properties()
             props.setProperty("mail.transport.protocol", "imap") // 使用的协议（JavaMail规范要求）
@@ -124,16 +124,20 @@ interface MailHelper {
             val folder = store.getFolder("INBOX") // 获得用户的邮件帐户
             folder.open(Folder.READ_WRITE) // 设置对邮件帐户的访问权限
             val inbox = folder as IMAPFolder
-            val message = inbox.getMessageByUID(mailBean.uid)
-            message.setFlag(Flags.Flag.SEEN, true)
+            for (mailBean in mails) {
+                val message = inbox.getMessageByUID(mailBean.uid)
+                message.setFlag(Flags.Flag.SEEN, true)
+            }
             folder.close(true) // 关闭邮件夹对象
             store.close() // 关闭连接对象
         } catch (e: Exception) {
             e.printStackTrace()
             return false
         }
-        mailBean.readFlag = 1
-        mailBean.save()
+        for (mailBean in mails) {
+            mailBean.readFlag = 1
+            mailBean.save()
+        }
         return true
     }
 }

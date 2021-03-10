@@ -68,7 +68,9 @@ class EmailDetailActivity : EmailAttachmentBaseActivity(), View.OnClickListener,
         if (noRead) {
             //向服务器标记已读
             exec({
-                setMailSeenFlag(mailBean)
+                setMailSeenFlag(mutableListOf<MailBean>().apply {
+                    add(mailBean)
+                })
             }, {
                 if (it) {
                     //标记成功

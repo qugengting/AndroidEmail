@@ -304,14 +304,28 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
                 })
     }
 
+    /**
+     * 全部标记为已读
+     */
     private fun markAllRead() {
-        for (bean in list) {
-            bean.readFlag = 1
-        }
+        val list = LitePal.where("account = ? and type = ? and readFlag = ?", MailConstants.MAIL_ACCOUNT, "0", "0")
+                .order("sendTime desc").find(MailBean::class.java)
+        //修改数据库，参考https://guolin.blog.csdn.net/article/details/40083685
         val mailBean = MailBean()
         mailBean.readFlag = 1
-        mailBean.updateAll()
-        adapter.notifyDataSetChanged()
+        mailBean.updateAll("account = ? and type = ?", MailConstants.MAIL_ACCOUNT, "0")
+        //更新标题和数据
+        titleSelect = ITEM_ALL
+        showData()
+        updateTitle()
+        //修改服务器数据
+        exec({
+            setMailSeenFlag(list)
+        }, {
+            if (it) {
+                Log.e(TAG, "服务器收件箱已全部标记为已读")
+            }
+        })
     }
 
     /**
