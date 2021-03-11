@@ -29,14 +29,9 @@ import com.qugengting.email.widget.PopupDialog
 import com.qugengting.email.widget.PopupView
 import com.sun.mail.imap.IMAPFolder
 import com.sun.mail.util.MailSSLSocketFactory
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_email_main.*
 import kotlinx.android.synthetic.main.include_email_head_side.*
+import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -50,16 +45,19 @@ import javax.activation.MailcapCommandMap
 import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeUtility
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 云邮首页
  */
-class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
+class MainActivity : BaseActivity(), View.OnClickListener, MailHelper, CoroutineScope {
+    private lateinit var job: Job
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     private lateinit var adapter: RecvAdapter
     private lateinit var mLRecyclerViewAdapter: LRecyclerViewAdapter
     private lateinit var list: MutableList<MailBean>
-    private var compositeDisposable: CompositeDisposable? = null
     private lateinit var dialog: PopupDialog
     private lateinit var popupView: PopupView
     private var updateResult = false
@@ -67,6 +65,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        job = Job()
         StatusBarUtils.setDefault(this)
         System.setProperty("mail.mime.splitlongparameters", "false")
         EventBus.getDefault().register(this)
@@ -228,80 +227,46 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
     }//滚回到顶部
 
     private fun getNewMail() {
-        compositeDisposable = CompositeDisposable()
-        Observable.create<String> { emitter ->
-            val result = getMails()
-            list.sort()
-            emitter.onNext(result)
-            emitter.onComplete()
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<String> {
-                    override fun onSubscribe(d: Disposable) {
-                        compositeDisposable?.add(d)
-                    }
-
-                    override fun onNext(value: String) {
-                        rvRecv.refreshComplete(REQUEST_COUNT)
-                        if (value == "ok") {
-                            titleSelect = ITEM_ALL
-                            showData()
-                            updateTitle()
-                            lastUpdateTime = System.currentTimeMillis()
-                            tvUpdateStatus.text = String.format(getString(R.string.mail_update), DateUtils.getFormatDate(Date(lastUpdateTime)))
-                        } else {
-                            updateResult = false
-                            tvUpdateStatus.text = getString(R.string.mail_update_fail)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        e.printStackTrace()
-                        rvRecv.refreshComplete(REQUEST_COUNT)
-                        adapter.notifyDataSetChanged()
-                        rvRecv.smoothScrollToPosition(0) //滚回到顶部
-                    }
-
-                    override fun onComplete() {}
-                })
+        //在当前协程作用域下创建新的子协程
+        launch {
+            //withContext会强制要求指定线程参数，然后立即执行，并阻塞当前协程，直到执行结束返回结果
+            //而async{}.await不必指定线程参数，且调用await才执行，同样会阻塞当前协程
+            val result = withContext(Dispatchers.IO) {
+                getMails()
+            }
+            rvRecv.refreshComplete(REQUEST_COUNT)
+            if (result == "ok") {
+                titleSelect = ITEM_ALL
+                showData()
+                updateTitle()
+                lastUpdateTime = System.currentTimeMillis()
+                tvUpdateStatus.text = String.format(getString(R.string.mail_update), DateUtils.getFormatDate(Date(lastUpdateTime)))
+            } else {
+                updateResult = false
+                tvUpdateStatus.text = getString(R.string.mail_update_fail)
+            }
+        }
     }
 
     private fun getOldMail() {
-        compositeDisposable = CompositeDisposable()
-        Observable.create<String> { emitter ->
-            val result = getMails(true)
-            emitter.onNext(result)
-            emitter.onComplete()
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<String> {
-                    override fun onSubscribe(d: Disposable) {
-                        compositeDisposable?.add(d)
-                    }
-
-                    override fun onNext(value: String) {
-                        rvRecv.refreshComplete(REQUEST_COUNT)
-                        if (value == "ok") {
-                            if (titleSelect != ITEM_ALL) {
-                                titleSelect = ITEM_ALL
-                                showData()
-                            } else {
-                                adapter.notifyDataSetChanged()
-                            }
-                            updateTitle()
-                        } else {
-                            updateResult = false
-                            tvUpdateStatus.text = getString(R.string.mail_loadmore_fail)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        e.printStackTrace()
-                        rvRecv.refreshComplete(REQUEST_COUNT)
-                    }
-
-                    override fun onComplete() {}
-                })
+        launch {
+            val result = withContext(Dispatchers.IO) {
+                getMails(true)
+            }
+            rvRecv.refreshComplete(REQUEST_COUNT)
+            if (result == "ok") {
+                if (titleSelect != ITEM_ALL) {
+                    titleSelect = ITEM_ALL
+                    showData()
+                } else {
+                    adapter.notifyDataSetChanged()
+                }
+                updateTitle()
+            } else {
+                updateResult = false
+                tvUpdateStatus.text = getString(R.string.mail_loadmore_fail)
+            }
+        }
     }
 
     /**
@@ -378,8 +343,8 @@ class MainActivity : BaseActivity(), View.OnClickListener, MailHelper {
 
     override fun onDestroy() {
         super.onDestroy()
+        job.cancel()
         EventBus.getDefault().unregister(this)
-        compositeDisposable?.clear()
     }
 
     private fun getMails(isOld: Boolean = false): String {
